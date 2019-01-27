@@ -4,6 +4,22 @@ var closeCreatePostModalButton = document.querySelector('#close-create-post-moda
 
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
+
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    deferredPrompt.userChoice.then((choiseResult) => {
+      console.log(choiseResult.outcome);
+
+      if (choiseResult.outcome === 'dissmissed') {
+        console.log('User cancelled installation');
+      } else {
+        console.log('User add to home screen');
+      }
+    });
+
+    deferredPrompt = null;
+  }
 }
 
 function closeCreatePostModal() {
