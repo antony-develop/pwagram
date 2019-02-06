@@ -1,4 +1,4 @@
-const STATIC_CACHE_NAME = 'static_assets_v6';
+const STATIC_CACHE_NAME = 'static_assets_v7';
 const DYNAMIC_CACHE_NAME = 'dynamic_assets_v1';
 
 self.addEventListener('install', (event) => {
@@ -11,6 +11,7 @@ self.addEventListener('install', (event) => {
                cache.addAll([
                    '/',
                    '/index.html',
+                   '/offline.html',
                    '/src/js/app.js',
                    '/src/js/feed.js',
                    '/src/js/material.min.js',
@@ -63,7 +64,12 @@ self.addEventListener('fetch', (event) => {
                                     return res;
                                 });
                         })
-                        .catch((error) => {});
+                        .catch((error) => {
+                            return caches.open(STATIC_CACHE_NAME)
+                                .then(cache => {
+                                    return cache.match('/offline.html')
+                                });
+                        });
                 }
             })
     );
