@@ -73,7 +73,7 @@ self.addEventListener('fetch', (event) => {
                             .catch((error) => {
                                 return caches.open(STATIC_CACHE_NAME)
                                     .then(cache => {
-                                        if (event.request.url.indexOf('/help')) {
+                                        if (event.request.headers.get('accept').includes('text/html')) {
                                             return cache.match('/offline.html');
                                         }
                                     });
