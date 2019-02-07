@@ -74,3 +74,34 @@ self.addEventListener('fetch', (event) => {
             })
     );
 });
+
+// Cache-only strategy
+// self.addEventListener('fetch', event => {
+//     event.respondWith(
+//         caches.match(event.request)
+//     )
+// });
+
+// Network-only strategy
+// self.addEventListener('fetch', event => {
+//    event.respondWith(
+//        fetch(event.request)
+//    );
+// });
+
+// Network with cache fallback strategy
+// self.addEventListener('fetch', event => {
+//     event.respondWith(
+//         fetch(event.request)
+//             .then(response => {
+//                 return caches.open(DYNAMIC_CACHE_NAME)
+//                     .then((cache) => {
+//                         cache.put(event.request.url, response.clone());
+//                         return response;
+//                     });
+//             })
+//             .catch(error => {
+//                 return caches.match(event.request);
+//             })
+//     );
+// });
