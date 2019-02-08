@@ -79,7 +79,7 @@ self.addEventListener('fetch', (event) => {
                             .then((res) => {
                                 return caches.open(DYNAMIC_CACHE_NAME)
                                     .then((cache) => {
-                                        trimCache(DYNAMIC_CACHE_NAME, 10);
+                                        // trimCache(DYNAMIC_CACHE_NAME, 10);
                                         cache.put(event.request.url, res.clone());
                                         return res;
                                     });
