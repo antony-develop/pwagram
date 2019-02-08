@@ -15,6 +15,19 @@ const STATIC_ASSETS = [
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
 
+function trimCache(cacheName, maxItems) {
+    caches.open(cacheName)
+        .then(cache => {
+            return cache.keys()
+                .then(keys => {
+                    if (keys.length > maxItems) {
+                        cache.delete(keys[0])
+                            .then(trimCache(cacheName, maxItems));
+                    }
+                });
+        });
+}
+
 self.addEventListener('install', (event) => {
     console.log('[Service Worker] Installing Service Worker ...', event);
 
@@ -66,6 +79,7 @@ self.addEventListener('fetch', (event) => {
                             .then((res) => {
                                 return caches.open(DYNAMIC_CACHE_NAME)
                                     .then((cache) => {
+                                        trimCache(DYNAMIC_CACHE_NAME, 10);
                                         cache.put(event.request.url, res.clone());
                                         return res;
                                     });
