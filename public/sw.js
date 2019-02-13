@@ -1,4 +1,4 @@
-const STATIC_CACHE_NAME = 'static_assets_v10';
+const STATIC_CACHE_NAME = 'static_assets_v11';
 const DYNAMIC_CACHE_NAME = 'dynamic_assets_v1';
 const STATIC_ASSETS = [
     '/',
@@ -64,7 +64,43 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    if (STATIC_ASSETS.includes(event.request.url)) {
+    const dynamicContentUrl = 'https://pwagram-4967b.firebaseio.com/posts.json';
+    // if (event.request.url.indexOf(dynamicUrl) > -1) {
+    //     event.respondWith(
+    //         caches.open(DYNAMIC_CACHE_NAME)
+    //             .then(cache => {
+    //                 return cache.match(event.request)
+    //                     .then(response => {
+    //                         if (response) {
+    //                             fetch(event.request)
+    //                                 .then(result => {
+    //                                     cache.put(event.request, result.clone());
+    //                                 });
+    //                             console.log('boat', 'from cache', response);
+    //                             return response;
+    //                         } else {
+    //                             return fetch(event.request)
+    //                                 .then(result => {
+    //                                     cache.put(event.request, result.clone());
+    //                                     console.log('boat', 'from network', result);
+    //                                     return result;
+    //                                 });
+    //                         }
+    //                     });
+    //             })
+    //     )
+    if (event.request.url.indexOf(dynamicContentUrl) > -1) {
+        event.respondWith(
+            caches.open(DYNAMIC_CACHE_NAME)
+                .then(function (cache) {
+                    return fetch(event.request)
+                        .then(function (res) {
+                            cache.put(event.request, res.clone());
+                            return res;
+                        });
+                })
+        );
+    } else if (STATIC_ASSETS.includes(event.request.url)) {
         event.respondWith(
             caches.match(event.request)
         );
