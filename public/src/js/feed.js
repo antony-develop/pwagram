@@ -107,17 +107,25 @@ fetch(dynamicContentUrl)
       updateUI(Object.values(data));
     });
 
-if ('caches' in window) {
-  caches.match(dynamicContentUrl)
-      .then(response => {
-        if (response) {
-          return response.json();
-        }
-      })
+if ('indexedDB' in window) {
+  readAllData('posts')
       .then(data => {
-        console.log('From cache', data);
-        if (!networkDataReceived && data) {
-          updateUI(Object.values(data));
+        if (!networkDataReceived) {
+          console.log('From cache', data);
+          updateUI(data);
         }
       });
+
+  // caches.match(dynamicContentUrl)
+  //     .then(response => {
+  //       if (response) {
+  //         return response.json();
+  //       }
+  //     })
+  //     .then(data => {
+  //       console.log('From cache', data);
+  //       if (!networkDataReceived && data) {
+  //         updateUI(Object.values(data));
+  //       }
+  //     });
 }
