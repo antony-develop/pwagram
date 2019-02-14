@@ -8,6 +8,7 @@ const STATIC_ASSETS = [
     '/offline.html',
     '/src/js/app.js',
     '/src/js/feed.js',
+    '/src/js/idb.js',
     '/src/js/material.min.js',
     '/src/css/app.css',
     '/src/css/feed.css',
@@ -16,6 +17,14 @@ const STATIC_ASSETS = [
     'https://fonts.googleapis.com/icon?family=Material+Icons',
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
+
+const dbPromise = idb.openDb('posts-store', 1, db => {
+    if (!db.objectStoreNames.contains('posts')) {
+        db.createObjectStore('posts', {
+            keyPath: 'id'
+        });
+    }
+});
 
 function trimCache(cacheName, maxItems) {
     caches.open(cacheName)
@@ -92,15 +101,21 @@ self.addEventListener('fetch', (event) => {
     //             })
     //     )
     if (event.request.url.indexOf(dynamicContentUrl) > -1) {
-        event.respondWith(
-            caches.open(DYNAMIC_CACHE_NAME)
-                .then(function (cache) {
-                    return fetch(event.request)
-                        .then(function (res) {
-                            cache.put(event.request, res.clone());
-                            return res;
-                        });
-                })
+        event.respondWith(fetch(event.request)
+            .then(response => {
+                response.clone().json()
+                    .then(data => {
+                        for (let item of Object.values(data)) {
+                            dbPromise.then(db => {
+                                let tx = db.transaction('posts', 'readwrite');
+                                tx.objectStore('posts').put(item);
+                                return tx.complete;
+                            });
+                        }
+                    });
+
+                return response;
+            })
         );
     } else if (STATIC_ASSETS.includes(event.request.url)) {
         event.respondWith(
