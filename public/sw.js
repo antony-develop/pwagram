@@ -1,4 +1,5 @@
 importScripts('/src/js/idb.js')
+importScripts('/src/js/utility.js')
 
 const STATIC_CACHE_NAME = 'static_assets_v11';
 const DYNAMIC_CACHE_NAME = 'dynamic_assets_v1';
@@ -17,14 +18,6 @@ const STATIC_ASSETS = [
     'https://fonts.googleapis.com/icon?family=Material+Icons',
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
-
-const dbPromise = idb.openDb('posts-store', 1, db => {
-    if (!db.objectStoreNames.contains('posts')) {
-        db.createObjectStore('posts', {
-            keyPath: 'id'
-        });
-    }
-});
 
 function trimCache(cacheName, maxItems) {
     caches.open(cacheName)
@@ -106,11 +99,7 @@ self.addEventListener('fetch', (event) => {
                 response.clone().json()
                     .then(data => {
                         for (let item of Object.values(data)) {
-                            dbPromise.then(db => {
-                                let tx = db.transaction('posts', 'readwrite');
-                                tx.objectStore('posts').put(item);
-                                return tx.complete;
-                            });
+                            writeData('posts', item);
                         }
                     });
 
