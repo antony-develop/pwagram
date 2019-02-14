@@ -1,3 +1,5 @@
+importScripts('/src/js/idb.js')
+
 const STATIC_CACHE_NAME = 'static_assets_v11';
 const DYNAMIC_CACHE_NAME = 'dynamic_assets_v1';
 const STATIC_ASSETS = [
