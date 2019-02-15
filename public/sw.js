@@ -1,7 +1,7 @@
 importScripts('/src/js/idb.js')
 importScripts('/src/js/utility.js')
 
-const STATIC_CACHE_NAME = 'static_assets_v11';
+const STATIC_CACHE_NAME = 'static_assets_v12';
 const DYNAMIC_CACHE_NAME = 'dynamic_assets_v1';
 const STATIC_ASSETS = [
     '/',
@@ -98,9 +98,12 @@ self.addEventListener('fetch', (event) => {
             .then(response => {
                 response.clone().json()
                     .then(data => {
-                        for (let item of Object.values(data)) {
-                            writeData('posts', item);
-                        }
+                        clearAllData('posts')
+                            .then(() => {
+                                for (let item of Object.values(data)) {
+                                    writeData('posts', item);
+                                }
+                            });
                     });
 
                 return response;
