@@ -146,7 +146,25 @@ createPostForm.addEventListener('submit', event => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     navigator.serviceWorker.ready
         .then(serviceWorker => {
-          serviceWorker.sync.register('sync-new-post');
+          let post = {
+              id: (new Date).toISOString(),
+              title: titleInput.value,
+              location: locationInput.value
+          };
+
+          writeData('sync-posts', post)
+              .then(() => {
+                  return serviceWorker.sync.register('sync-new-post');
+              })
+              .then(() => {
+                let snackbarContainer = document.querySelector('#confirmation-toast');
+                snackbarContainer.MaterialSnackbar.showSnackbar({
+                    message: 'Your post was saved for syncing'
+                });
+              })
+              .catch(error => {
+                console.log(error);
+              });
         });
   }
 
