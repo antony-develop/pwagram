@@ -133,6 +133,26 @@ if ('indexedDB' in window) {
   //     });
 }
 
+function sendNewPostData() {
+  fetch(dynamicContentUrl, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+          id: (new Date()).toISOString(),
+          title: titleInput.value,
+          location: locationInput.value,
+          image: "https://firebasestorage.googleapis.com/v0/b/pwagram-4967b.appspot.com/o/sf-boat.jpg?alt=media&token=6c9cfcb1-c906-4b41-8fad-487f7c46fbca"
+      })
+  })
+      .then(response => {
+        console.log('Sent data', response);
+        updateUI();
+      })
+}
+
 createPostForm.addEventListener('submit', event => {
   event.preventDefault();
 
@@ -166,6 +186,7 @@ createPostForm.addEventListener('submit', event => {
                 console.log(error);
               });
         });
+  } else {
+    sendNewPostData();
   }
-
 });
