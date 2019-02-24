@@ -2,6 +2,9 @@ var shareImageButton = document.querySelector('#share-image-button');
 var createPostArea = document.querySelector('#create-post');
 var closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
 var sharedMomentsArea = document.querySelector('#shared-moments');
+var createPostForm = createPostArea.querySelector('form');
+var titleInput = createPostForm.querySelector('#title');
+var locationInput = createPostForm.querySelector('#location');
 
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
@@ -129,3 +132,22 @@ if ('indexedDB' in window) {
   //       }
   //     });
 }
+
+createPostForm.addEventListener('submit', event => {
+  event.preventDefault();
+
+  if (titleInput.value.trim() === '' || locationInput.value.trim() === '') {
+    alert('Please enter valid form data')
+    return;
+  }
+
+  closeCreatePostModal();
+  
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready
+        .then(serviceWorker => {
+          serviceWorker.sync.register('sync-new-post');
+        });
+  }
+
+});
