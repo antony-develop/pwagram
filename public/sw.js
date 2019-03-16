@@ -19,7 +19,7 @@ const STATIC_ASSETS = [
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
 
-const dynamicContentUrl = 'https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData';
+const dynamicContentUrl = 'https://pwagram-4967b.firebaseio.com/posts.json';
 
 function trimCache(cacheName, maxItems) {
     caches.open(cacheName)

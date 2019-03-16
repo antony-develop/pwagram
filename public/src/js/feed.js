@@ -97,7 +97,7 @@ function updateUI(data) {
   }
 }
 
-const dynamicContentUrl = 'https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData';
+const dynamicContentUrl = 'https://pwagram-4967b.firebaseio.com/posts.json';
 let networkDataReceived = false;
 
 fetch(dynamicContentUrl)
