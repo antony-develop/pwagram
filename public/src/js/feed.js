@@ -10,7 +10,7 @@ function openCreatePostModal() {
   createPostArea.style.display = 'block';
 
   if (deferredPrompt) {
-    deferredPrompt.prompt();
+    // deferredPrompt.prompt();
 
     deferredPrompt.userChoice.then((choiseResult) => {
       console.log(choiseResult.outcome);
@@ -134,7 +134,7 @@ if ('indexedDB' in window) {
 }
 
 function sendNewPostData() {
-  fetch(dynamicContentUrl, {
+  fetch('https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',

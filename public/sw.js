@@ -184,7 +184,7 @@ self.addEventListener('sync', (event) => {
              readAllData('sync-posts')
                  .then(data => {
                      for (let post of data) {
-                         fetch(dynamicContentUrl, {
+                         fetch('https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData', {
                              method: 'POST',
                              headers: {
                                  'Content-Type': 'application/json',
@@ -201,7 +201,10 @@ self.addEventListener('sync', (event) => {
                                  console.log('Sent data', response);
 
                                  if (response.ok) {
-                                     deleteItemFromData('sync-posts', post.id);
+                                     response.json()
+                                         .then(post => {
+                                             deleteItemFromData('sync-posts', post.id);
+                                         });
                                  }
                              })
                              .catch(error => {
