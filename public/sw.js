@@ -19,6 +19,8 @@ const STATIC_ASSETS = [
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css',
 ];
 
+const dynamicContentUrl = 'https://pwagram-4967b.firebaseio.com/posts.json';
+
 function trimCache(cacheName, maxItems) {
     caches.open(cacheName)
         .then(cache => {
@@ -68,7 +70,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    const dynamicContentUrl = 'https://pwagram-4967b.firebaseio.com/posts.json';
     // if (event.request.url.indexOf(dynamicUrl) > -1) {
     //     event.respondWith(
     //         caches.open(DYNAMIC_CACHE_NAME)
@@ -173,3 +174,41 @@ self.addEventListener('fetch', (event) => {
 //             })
 //     );
 // });
+
+self.addEventListener('sync', (event) => {
+     console.log('[Service worker] Background syncing', event);
+     
+     if (event.tag === 'sync-new-post') {
+         console.log('[Service worker] Syncing new Posts');
+         event.waitUntil(
+             readAllData('sync-posts')
+                 .then(data => {
+                     for (let post of data) {
+                         fetch(dynamicContentUrl, {
+                             method: 'POST',
+                             headers: {
+                                 'Content-Type': 'application/json',
+                                 'Accept': 'application/json'
+                             },
+                             body: JSON.stringify({
+                                 id: post.id,
+                                 title: post.title,
+                                 location: post.location,
+                                 image: "https://firebasestorage.googleapis.com/v0/b/pwagram-4967b.appspot.com/o/sf-boat.jpg?alt=media&token=6c9cfcb1-c906-4b41-8fad-487f7c46fbca"
+                             })
+                         })
+                             .then(response => {
+                                 console.log('Sent data', response);
+
+                                 if (response.ok) {
+                                     deleteItemFromData('sync-posts', post.id);
+                                 }
+                             })
+                             .catch(error => {
+                                 console.log('Error while sending post data', error);
+                             });
+                     }
+                 })
+         );
+     }
+});
