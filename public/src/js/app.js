@@ -27,9 +27,20 @@ function askNotificationPermission() {
         if (result != 'granted') {
             console.log('No permission granted =(');
         } else {
-            // show notification
+            displayConfirmNotification();
         }
     });
+}
+
+function displayConfirmNotification() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready
+            .then(serviceWorker => {
+                serviceWorker.showNotification('PWAGram (from SW)', {
+                    body: 'You are successfully subscribed for push notifications'
+                });
+            });
+    }
 }
 
 if ('Notification' in window) {
