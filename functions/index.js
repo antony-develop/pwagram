@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const cors = require('cors')({
     origin: true
 });
+const webPush = require('web-push');
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -23,6 +24,34 @@ exports.storePostData = functions.https.onRequest((request, response) => {
             image:  post.image
         })
             .then(() => {
+                const webPushData = require('functions/web-push-data');
+                webPush.setVapidDetails(
+                    webPushData.email,
+                    webPushData.publicKey,
+                    webPushData.privateKey
+                );
+
+                return admin.database.ref('subscriptions').once('value');
+            })
+            .then(subscriptions => {
+                subscriptions.forEach(subscription => {
+                    var pushConfig = {
+                        endpoint: subscription.val().endpoint,
+                        keys: {
+                            auth: subscription.val().keys.auth,
+                            p256dh: subscription.val().keys.p256dh,
+                        }
+                    };
+
+                    webPush.sendNotification(pushConfig, JSON.stringify({
+                        title: 'New Post',
+                        content: 'New post have been added. Check it out!'
+                    }))
+                        .catch(error => {
+                            console.log('Error while sending notification', error);
+                        });
+                });
+
                 response.status(201).json({
                     message: 'Data have been added',
                     id: post.id
@@ -35,3 +64,4 @@ exports.storePostData = functions.https.onRequest((request, response) => {
             });
     });
 });
+

@@ -2,3 +2,4 @@
 node_modules
 .firebase/
 firebase-adminsdk-key.json
+web-push-data.json
