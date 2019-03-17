@@ -37,7 +37,15 @@ function displayConfirmNotification() {
         navigator.serviceWorker.ready
             .then(serviceWorker => {
                 serviceWorker.showNotification('PWAGram (from SW)', {
-                    body: 'You are successfully subscribed for push notifications'
+                    body: 'You are successfully subscribed for push notifications',
+                    icon: '/src/images/icons/app-icon-96x96.png',
+                    image: '/src/images/sf-boat.jpg',
+                    dir: 'ltr',
+                    lang: 'en-US',
+                    vibrate: [100, 50, 500],
+                    badge: '/src/images/icons/app-icon-96x96.png',
+                    tag: 'confirm-notification',
+                    renotify: false,
                 });
             });
     }
