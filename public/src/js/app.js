@@ -27,16 +27,55 @@ function askNotificationPermission() {
         if (result != 'granted') {
             console.log('No permission granted =(');
         } else {
-            displayConfirmNotification();
+            // displayConfirmNotification();
+            configurePushSubscription();
         }
     });
+}
+
+function configurePushSubscription() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready
+            .then(serviceWorker => {
+                serviceWorker.pushManager.getSubscription()
+                    .then(subscription => {
+                        if (subscription) {
+                            //
+                        } else {
+                            const vapidPublicKey = urlBase64ToUint8Array('BFRZdvB8qJ9iTsWcyQ6JZmRQpqCkSUGIzV3nc7SKyNy-T4Auna9PlicxHBHJZk7YFxEEeQdMy7_4wy6Z9V7wWPs');
+                            return serviceWorker.pushManager.subscribe({
+                                userVisibleOnly: true,
+                                applicationServerKey: vapidPublicKey
+                            });
+                        }
+                    })
+                    .then(subscription => {
+                        return fetch('https://pwagram-4967b.firebaseio.com/subscriptions.json', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(subscription)
+                        });
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            displayConfirmNotification();
+                        }
+                    });
+            })
+            .catch(error => {
+                console.log('Error:', error);
+            });
+    }
 }
 
 function displayConfirmNotification() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready
             .then(serviceWorker => {
-                serviceWorker.showNotification('PWAGram (from SW)', {
+                serviceWorker.showNotification('PWAGram', {
                     body: 'You are successfully subscribed for push notifications',
                     icon: '/src/images/icons/app-icon-96x96.png',
                     image: '/src/images/sf-boat.jpg',
