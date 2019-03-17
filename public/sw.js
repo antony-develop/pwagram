@@ -217,12 +217,30 @@ self.addEventListener('sync', (event) => {
 });
 
 self.addEventListener('notificationclick', e => {
+   console.log('Notification have been clicked', e);
    console.log(e.notification);
 
    if (e.action === 'confirm') {
        console.log('Confirm have been chosen');
    } else {
        console.log(e.action);
+       e.waitUntil(
+           clients.matchAll()
+               .then(activeClients => {
+                   const client = activeClients.find(activeClient => {
+                       return activeClient.visibilityState === 'visible';
+                   });
+
+                   if (client) {
+                       client.navigate('http://localhost:8080');
+                       client.focus();
+                   } else {
+                       clients.openWindow('http://localhost:8080');
+                   }
+
+                   e.notification.close();
+               })
+       );
    }
 
    e.notification.close();
