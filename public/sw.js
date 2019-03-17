@@ -232,10 +232,10 @@ self.addEventListener('notificationclick', e => {
                    });
 
                    if (client) {
-                       client.navigate('http://localhost:8080');
+                       client.navigate(e.notification.data.url);
                        client.focus();
                    } else {
-                       clients.openWindow('http://localhost:8080');
+                       clients.openWindow(e.notification.data.url);
                    }
 
                    e.notification.close();
@@ -261,6 +261,9 @@ self.addEventListener('push', event => {
                 body: data.content,
                 icon: '/src/images/icons/app-icon-96x96.png',
                 badge: '/src/images/icons/app-icon-96x96.png',
+                data: {
+                    url: data.openUrl
+                }
             })
         )
     }
