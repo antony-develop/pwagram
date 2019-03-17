@@ -215,3 +215,15 @@ self.addEventListener('sync', (event) => {
          );
      }
 });
+
+self.addEventListener('notificationclick', e => {
+   console.log(e.notification);
+
+   if (e.action === 'confirm') {
+       console.log('Confirm have been chosen');
+   } else {
+       console.log(e.action);
+   }
+
+   e.notification.close();
+});
