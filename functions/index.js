@@ -24,18 +24,18 @@ exports.storePostData = functions.https.onRequest((request, response) => {
             image:  post.image
         })
             .then(() => {
-                const webPushData = require('functions/web-push-data');
+                const webPushData = require('./web-push-data.json');
                 webPush.setVapidDetails(
                     webPushData.email,
                     webPushData.publicKey,
                     webPushData.privateKey
                 );
 
-                return admin.database.ref('subscriptions').once('value');
+                return admin.database().ref('subscriptions').once('value');
             })
             .then(subscriptions => {
                 subscriptions.forEach(subscription => {
-                    var pushConfig = {
+                    const pushConfig = {
                         endpoint: subscription.val().endpoint,
                         keys: {
                             auth: subscription.val().keys.auth,
