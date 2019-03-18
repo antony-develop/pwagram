@@ -1,13 +1,40 @@
-var shareImageButton = document.querySelector('#share-image-button');
-var createPostArea = document.querySelector('#create-post');
-var closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
-var sharedMomentsArea = document.querySelector('#shared-moments');
-var createPostForm = createPostArea.querySelector('form');
-var titleInput = createPostForm.querySelector('#title');
-var locationInput = createPostForm.querySelector('#location');
+const shareImageButton = document.querySelector('#share-image-button');
+const createPostArea = document.querySelector('#create-post');
+const closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
+const sharedMomentsArea = document.querySelector('#shared-moments');
+const createPostForm = createPostArea.querySelector('form');
+const titleInput = createPostForm.querySelector('#title');
+const locationInput = createPostForm.querySelector('#location');
+
+const videoPlayer = document.querySelector('#player');
+const canvasElement = document.querySelector('#canvas');
+const captureButton = document.querySelector('#capture-btn');
+const imagePicker = document.querySelector('#image-picker');
+const pickImageContainer = document.querySelector('#pick-image');
+
+function initMedia() {
+    if ('mediaDevices' in navigator) {
+        //
+    } else {
+        navigator.mediaDevices = {
+            getUserMedia: function (constraints) {
+                let getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+                if (getUserMedia) {
+                    return new Promise((resolve, reject) => {
+                        getUserMedia.call(navigator, constraints, resolve, reject);
+                    });
+                } else {
+                    return new Promise.reject(new Error('getUserMedia is not implemented in the browser'));
+                }
+            }
+        };
+    }
+}
 
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
+  initMedia();
 
   if (deferredPrompt) {
     // deferredPrompt.prompt();
