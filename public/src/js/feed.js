@@ -12,6 +12,8 @@ const captureButton = document.querySelector('#capture-btn');
 const imagePicker = document.querySelector('#image-picker');
 const pickImageContainer = document.querySelector('#pick-image');
 
+let picture;
+
 function initMedia() {
     if ('mediaDevices' in navigator) {
         //
@@ -54,6 +56,8 @@ captureButton.addEventListener('click', event => {
    videoPlayer.srcObject.getVideoTracks().forEach(track => {
        track.stop();
    });
+
+   picture = dataURItoBlob(canvasElement.toDataURL());
 });
 
 function openCreatePostModal() {
@@ -191,23 +195,21 @@ if ('indexedDB' in window) {
 }
 
 function sendNewPostData() {
-  fetch('https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData', {
+    const postData = new FormData();
+    const postId = (new Date()).toISOString();
+    postData.append('id', postId);
+    postData.append('title', titleInput.value);
+    postData.append('location', locationInput.value);
+    postData.append('file', picture, `${postId}.png`);
+
+    fetch('https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData', {
       method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-          id: (new Date()).toISOString(),
-          title: titleInput.value,
-          location: locationInput.value,
-          image: "https://firebasestorage.googleapis.com/v0/b/pwagram-4967b.appspot.com/o/sf-boat.jpg?alt=media&token=6c9cfcb1-c906-4b41-8fad-487f7c46fbca"
-      })
-  })
-      .then(response => {
+      body: postData
+    })
+        .then(response => {
         console.log('Sent data', response);
         updateUI();
-      })
+        })
 }
 
 createPostForm.addEventListener('submit', event => {
@@ -226,7 +228,8 @@ createPostForm.addEventListener('submit', event => {
           let post = {
               id: (new Date).toISOString(),
               title: titleInput.value,
-              location: locationInput.value
+              location: locationInput.value,
+              picture: picture
           };
 
           writeData('sync-posts', post)

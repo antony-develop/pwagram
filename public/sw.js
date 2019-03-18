@@ -1,7 +1,7 @@
 importScripts('/src/js/idb.js')
 importScripts('/src/js/utility.js')
 
-const STATIC_CACHE_NAME = 'static_assets_v26';
+const STATIC_CACHE_NAME = 'static_assets_v27';
 const DYNAMIC_CACHE_NAME = 'dynamic_assets_v1';
 const STATIC_ASSETS = [
     '/',
@@ -184,18 +184,15 @@ self.addEventListener('sync', (event) => {
              readAllData('sync-posts')
                  .then(data => {
                      for (let post of data) {
+                         const postData = new FormData();
+                         postData.append('id', post.id);
+                         postData.append('title', post.title);
+                         postData.append('location', post.location);
+                         postData.append('file', post.picture, `${post.id}.png`);
+
                          fetch('https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData', {
                              method: 'POST',
-                             headers: {
-                                 'Content-Type': 'application/json',
-                                 'Accept': 'application/json'
-                             },
-                             body: JSON.stringify({
-                                 id: post.id,
-                                 title: post.title,
-                                 location: post.location,
-                                 image: "https://firebasestorage.googleapis.com/v0/b/pwagram-4967b.appspot.com/o/sf-boat.jpg?alt=media&token=6c9cfcb1-c906-4b41-8fad-487f7c46fbca"
-                             })
+                             body: postData
                          })
                              .then(response => {
                                  console.log('Sent data', response);
