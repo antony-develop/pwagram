@@ -43,6 +43,19 @@ function initMedia() {
         })
 }
 
+captureButton.addEventListener('click', event => {
+   canvasElement.style.display = 'block';
+   videoPlayer.style.display = 'none';
+   captureButton.style.display = 'none';
+
+   let context = canvasElement.getContext('2d');
+   context.drawImage(videoPlayer, 0,0, canvasElement.width,
+       videoPlayer.videoHeight / (videoPlayer.videoWidth / canvasElement.width));
+   videoPlayer.srcObject.getVideoTracks().forEach(track => {
+       track.stop();
+   });
+});
+
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
   initMedia();
