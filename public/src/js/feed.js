@@ -77,10 +77,13 @@ function unregisterServiceWorkers() {
 }
 
 function closeCreatePostModal() {
-  createPostArea.style.display = 'none';
-  pickImageContainer.style.display = 'none';
-  videoPlayer.style.display = 'none';
-  canvasElement.style.display = 'none';
+    createPostArea.style.display = 'none';
+    pickImageContainer.style.display = 'none';
+    videoPlayer.style.display = 'none';
+    canvasElement.style.display = 'none';
+    videoPlayer.srcObject.getVideoTracks().forEach(track => {
+        track.stop();
+    });
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
