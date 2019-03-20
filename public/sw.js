@@ -1,13 +1,14 @@
 importScripts('/src/js/idb.js')
 importScripts('/src/js/utility.js')
 
-const STATIC_CACHE_NAME = 'static_assets_v27';
-const DYNAMIC_CACHE_NAME = 'dynamic_assets_v1';
+const STATIC_CACHE_NAME = 'static_assets_v29';
+const DYNAMIC_CACHE_NAME = 'dynamic_assets_v3';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
     '/offline.html',
     '/src/js/app.js',
+    '/src/js/utility.js',
     '/src/js/feed.js',
     '/src/js/idb.js',
     '/src/js/material.min.js',

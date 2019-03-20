@@ -207,8 +207,7 @@ function sendNewPostData() {
       body: postData
     })
         .then(response => {
-        console.log('Sent data', response);
-        updateUI();
+            updateUI();
         })
 }
 
