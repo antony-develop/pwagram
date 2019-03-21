@@ -15,6 +15,7 @@ const UUID = require('uuid-v4');
 const os = require('os');
 const Busboy = require('busboy');
 const path = require('path');
+const geoCoder = require('city-reverse-geocoder');
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -111,6 +112,16 @@ exports.storePostData = functions.https.onRequest((request, response) => {
         });
 
         busboy.end(request.rawBody);
+    });
+});
+
+exports.reverseGeocode = functions.https.onRequest((request, response) => {
+    return cors(request, response, () => {
+        let { latitude, longitude } = request.query;
+
+        decodedCity = geoCoder(latitude, longitude)[0];
+
+        return response.status(200).json(decodedCity);
     });
 });
 

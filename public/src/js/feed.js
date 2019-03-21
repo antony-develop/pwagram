@@ -1,3 +1,9 @@
+const apisUrl = {
+    postFetch: 'https://pwagram-4967b.firebaseio.com/posts.json',
+    postSync: 'https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData',
+    cityGeocode: 'https://us-central1-pwagram-4967b.cloudfunctions.net/reverseGeocode',
+}
+
 const shareImageButton = document.querySelector('#share-image-button');
 const createPostArea = document.querySelector('#create-post');
 const closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
@@ -11,8 +17,51 @@ const canvasElement = document.querySelector('#canvas');
 const captureButton = document.querySelector('#capture-btn');
 const imagePicker = document.querySelector('#image-picker');
 const pickImageContainer = document.querySelector('#pick-image');
-
+const locationBtn = document.querySelector('#location-btn');
+const locationLoaderIndicator = document.querySelector('#location-loader');
 let picture;
+let userLocation = null;
+
+locationBtn.addEventListener('click', event => {
+    locationBtn.style.display = 'none';
+    locationLoaderIndicator.style.display = 'block';
+    navigator.geolocation.getCurrentPosition(
+        position => {
+            locationBtn.style.display = 'inline';
+            locationLoaderIndicator.style.display = 'none';
+            console.log('position', position.coords);
+
+            fetch(`${apisUrl.cityGeocode}?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`)
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    if (data) {
+                        locationInput.value = `${data.city}, ${data.country}`;
+                        locationInput.parentElement.classList.add('is-focused');
+                    } else {
+                        alert('Couldn\'t find City for your coordinates, please enter it manually.');
+                    }
+                });
+        }, error => {
+            console.log('Error while getting location', error);
+            locationBtn.style.display = 'inline';
+            locationLoaderIndicator.style.display = 'none';
+            alert('Couldn\'t fetch your location, please enter it manually.');
+            userLocation = null;
+        }
+    );
+});
+
+function initLocation() {
+    if ('geolocation' in navigator) {
+        locationBtn.style.display = 'inline';
+    } else {
+        locationBtn.style.display = 'none';
+    }
+}
+
 
 function initMedia() {
     if ('mediaDevices' in navigator) {
@@ -67,6 +116,7 @@ imagePicker.addEventListener('change', event => {
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
   initMedia();
+  initLocation();
 
   if (deferredPrompt) {
     // deferredPrompt.prompt();
@@ -107,6 +157,8 @@ function closeCreatePostModal() {
             track.stop();
         });
     }
+    locationBtn.style.display = 'inline';
+    locationLoaderIndicator.style.display = 'none';
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
@@ -164,10 +216,9 @@ function updateUI(data) {
   }
 }
 
-const dynamicContentUrl = 'https://pwagram-4967b.firebaseio.com/posts.json';
 let networkDataReceived = false;
 
-fetch(dynamicContentUrl)
+fetch(apisUrl.postFetch)
     .then(function(res) {
       return res.json();
     })
@@ -186,7 +237,7 @@ if ('indexedDB' in window) {
         }
       });
 
-  // caches.match(dynamicContentUrl)
+  // caches.match(apisUrl.postFetch)
   //     .then(response => {
   //       if (response) {
   //         return response.json();
@@ -208,7 +259,7 @@ function sendNewPostData() {
     postData.append('location', locationInput.value);
     postData.append('file', picture, `${postId}.png`);
 
-    fetch('https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData', {
+    fetch(apisUrl.postSync, {
       method: 'POST',
       body: postData
     })
