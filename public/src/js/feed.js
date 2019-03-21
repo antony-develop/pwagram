@@ -60,6 +60,10 @@ captureButton.addEventListener('click', event => {
    picture = dataURItoBlob(canvasElement.toDataURL());
 });
 
+imagePicker.addEventListener('change', event => {
+    picture = event.target.files[0];
+});
+
 function openCreatePostModal() {
   createPostArea.style.display = 'block';
   initMedia();
@@ -98,9 +102,11 @@ function closeCreatePostModal() {
     pickImageContainer.style.display = 'none';
     videoPlayer.style.display = 'none';
     canvasElement.style.display = 'none';
-    videoPlayer.srcObject.getVideoTracks().forEach(track => {
-        track.stop();
-    });
+    if (videoPlayer.srcObject) {
+        videoPlayer.srcObject.getVideoTracks().forEach(track => {
+            track.stop();
+        });
+    }
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
