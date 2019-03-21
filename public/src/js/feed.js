@@ -152,6 +152,7 @@ function closeCreatePostModal() {
     pickImageContainer.style.display = 'none';
     videoPlayer.style.display = 'none';
     canvasElement.style.display = 'none';
+    captureButton.style.display = 'inline';
     if (videoPlayer.srcObject) {
         videoPlayer.srcObject.getVideoTracks().forEach(track => {
             track.stop();
