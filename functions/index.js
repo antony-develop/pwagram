@@ -4,12 +4,12 @@ const cors = require('cors')({
     origin: true
 });
 const webPush = require('web-push');
-const googleCloudConfig = {
+const {Storage} = require('@google-cloud/storage');
+const googleCloudStorage = new Storage({
     projectId: 'pwagram-4967b',
     keyFilename: 'firebase-adminsdk-key.json'
-};
-const {Storage} = require('@google-cloud/storage');
-const googleCloudStorage = new Storage(googleCloudConfig);
+});
+
 const fs = require('fs');
 const UUID = require('uuid-v4');
 const os = require('os');
@@ -34,8 +34,6 @@ exports.storePostData = functions.https.onRequest((request, response) => {
         let postImage;
         const fields = {};
 
-        console.log('before busboy code');
-
         busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
             postImage = {
                 path: path.join(os.tmpdir(), filename),
@@ -44,12 +42,11 @@ exports.storePostData = functions.https.onRequest((request, response) => {
             file.pipe(fs.createWriteStream(postImage.path));
         });
 
-        busboy.on('field', (fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) => {
-            fields[fieldname] = val;
+        busboy.on('field', (fieldname, value) => {
+            fields[fieldname] = value;
         });
 
         busboy.on('finish', () => {
-            console.log('busboy finish');
             let bucket = googleCloudStorage.bucket('pwagram-4967b.appspot.com');
             bucket.upload(postImage.path, {
                 uploadTime: 'media',
@@ -60,7 +57,6 @@ exports.storePostData = functions.https.onRequest((request, response) => {
                     }
                 }
             }, (error, file) => {
-                console.log('bucket upload callback');
                 if (error) {
                     console.log(error);
                 } else  {
@@ -71,7 +67,6 @@ exports.storePostData = functions.https.onRequest((request, response) => {
                         image: `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media&token=${uuid}`
                     })
                         .then(() => {
-                            console.log('push to posts database');
                             const webPushData = require('./web-push-data.json');
                             webPush.setVapidDetails(
                                 webPushData.email,
@@ -82,7 +77,6 @@ exports.storePostData = functions.https.onRequest((request, response) => {
                             return admin.database().ref('subscriptions').once('value');
                         })
                         .then(subscriptions => {
-                            console.log('got push subs');
                             subscriptions.forEach(subscription => {
                                 const pushConfig = {
                                     endpoint: subscription.val().endpoint,
