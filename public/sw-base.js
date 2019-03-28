@@ -6,4 +6,8 @@ self.addEventListener('message', (event) => {
     }
 });
 
+workbox.routing.registerRoute(/.*(?:googleapis|gstatic)\.com.*$/, new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'google-fonts',
+}));
+
 workbox.precaching.precacheAndRoute([]);

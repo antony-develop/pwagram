@@ -6,6 +6,10 @@ self.addEventListener('message', (event) => {
     }
 });
 
+workbox.routing.registerRoute(/.*(?:googleapis|gstatic)\.com.*$/, new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'google-fonts',
+}));
+
 workbox.precaching.precacheAndRoute([
   {
     "url": "404.html",
@@ -69,7 +73,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "sw-base.js",
-    "revision": "92a4564c00b3b5e89b706882543b80b1"
+    "revision": "879cde523dab3707d829ea89801bf021"
   },
   {
     "url": "sw.js",
