@@ -6,9 +6,24 @@ self.addEventListener('message', (event) => {
     }
 });
 
+workbox.routing.registerRoute(/.*(?:firebasestorage\.googleapis)\.com.*$/, new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'post-images',
+}));
+
 workbox.routing.registerRoute(/.*(?:googleapis|gstatic)\.com.*$/, new workbox.strategies.StaleWhileRevalidate({
     cacheName: 'google-fonts',
+    plugins: [
+        new workbox.expiration.Plugin({
+            maxEntries: 3,
+            maxAgeSeconds: 30*24*60*60,
+        }),
+    ]
 }));
+
+workbox.routing.registerRoute('https://code.getmdl.io/1.3.0/material.indigo-pink.min.css', new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'material-css',
+}));
+
 
 workbox.precaching.precacheAndRoute([
   {
@@ -73,7 +88,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "sw-base.js",
-    "revision": "879cde523dab3707d829ea89801bf021"
+    "revision": "1d099c69e0f4a4cf40b44d2ef4d0e818"
   },
   {
     "url": "sw.js",
