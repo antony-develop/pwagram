@@ -86,7 +86,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "index.html",
-    "revision": "49e87076aa3542f8acf8c277a54a4cda"
+    "revision": "df28ac5eecb46d8ed56339b37951020a"
   },
   {
     "url": "manifest.json",
@@ -94,7 +94,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "offline.html",
-    "revision": "c31a356646794e12b07281d93b0f1b06"
+    "revision": "bd7abeb8b45d57b669cbca9217b48f97"
   },
   {
     "url": "src/css/app.css",
@@ -141,16 +141,8 @@ workbox.precaching.precacheAndRoute([
     "revision": "b0e6cd062c443f2fbd9cb5b10691670e"
   },
   {
-    "url": "src/images/main-image-lg.jpg",
-    "revision": "31b19bffae4ea13ca0f2178ddb639403"
-  },
-  {
-    "url": "src/images/main-image-sm.jpg",
-    "revision": "c6bb733c2f39c60e3c139f814d2d14bb"
-  },
-  {
     "url": "src/images/main-image.jpg",
-    "revision": "5c66d091b0dc200e8e89e56c589821fb"
+    "revision": "894071713a4337c76c8aa86b4bfa0417"
   },
   {
     "url": "src/images/sf-boat.jpg",
