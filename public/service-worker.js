@@ -47,6 +47,33 @@ workbox.routing.registerRoute(dynamicContentUrl, ({url, event, params}) => {
         });
 });
 
+workbox.routing.registerRoute(({url, event}) => {
+    return (event.request.headers.get('accept').includes('text/html'));
+}, ({url, event, params}) => {
+    return caches.match(event.request)
+        .then((response) => {
+            if (response) {
+                return response;
+            } else {
+                return fetch(event.request)
+                    .then((res) => {
+                        return caches.open('dynamic')
+                            .then((cache) => {
+                                cache.put(event.request.url, res.clone());
+                                return res;
+                            });
+                    })
+                    .catch((error) => {
+                        return caches.match(
+                            workbox.precaching.getCacheKeyForURL('/offline.html')
+                        )
+                            .then(response => {
+                                return response;
+                            });
+                    });
+            }
+        });
+});
 
 workbox.precaching.precacheAndRoute([
   {
@@ -59,7 +86,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "index.html",
-    "revision": "4e654090d29219258261c2742b913885"
+    "revision": "49e87076aa3542f8acf8c277a54a4cda"
   },
   {
     "url": "manifest.json",
@@ -67,7 +94,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "offline.html",
-    "revision": "2621f6071a70db3c3e26909ef739a0d4"
+    "revision": "c31a356646794e12b07281d93b0f1b06"
   },
   {
     "url": "src/css/app.css",
@@ -83,7 +110,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "src/js/app.js",
-    "revision": "caf17942272d612b15415ab320c0f2d6"
+    "revision": "3f7e250bb191b3a1f49141e11d04da21"
   },
   {
     "url": "src/js/feed.js",
@@ -111,7 +138,7 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "sw-base.js",
-    "revision": "46898eed4bd9d26939e42ecd9815f28e"
+    "revision": "f4aafcc5b03b455e508850884c54a19d"
   },
   {
     "url": "sw.js",

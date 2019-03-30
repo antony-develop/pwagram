@@ -47,5 +47,32 @@ workbox.routing.registerRoute(dynamicContentUrl, ({url, event, params}) => {
         });
 });
 
+workbox.routing.registerRoute(({url, event}) => {
+    return (event.request.headers.get('accept').includes('text/html'));
+}, ({url, event, params}) => {
+    return caches.match(event.request)
+        .then((response) => {
+            if (response) {
+                return response;
+            } else {
+                return fetch(event.request)
+                    .then((res) => {
+                        return caches.open('dynamic')
+                            .then((cache) => {
+                                cache.put(event.request.url, res.clone());
+                                return res;
+                            });
+                    })
+                    .catch((error) => {
+                        return caches.match(
+                            workbox.precaching.getCacheKeyForURL('/offline.html')
+                        )
+                            .then(response => {
+                                return response;
+                            });
+                    });
+            }
+        });
+});
 
 workbox.precaching.precacheAndRoute([]);
