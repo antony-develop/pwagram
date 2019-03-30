@@ -76,3 +76,94 @@ workbox.routing.registerRoute(({url, event}) => {
 });
 
 workbox.precaching.precacheAndRoute([]);
+
+self.addEventListener('sync', (event) => {
+    console.log('[Service worker] Background syncing', event);
+
+    if (event.tag === 'sync-new-post') {
+        console.log('[Service worker] Syncing new Posts');
+        event.waitUntil(
+            readAllData('sync-posts')
+                .then(data => {
+                    for (let post of data) {
+                        const postData = new FormData();
+                        postData.append('id', post.id);
+                        postData.append('title', post.title);
+                        postData.append('location', post.location);
+                        postData.append('file', post.picture, `${post.id}.png`);
+
+                        fetch('https://us-central1-pwagram-4967b.cloudfunctions.net/storePostData', {
+                            method: 'POST',
+                            body: postData
+                        })
+                            .then(response => {
+                                console.log('Sent data', response);
+
+                                if (response.ok) {
+                                    response.json()
+                                        .then(post => {
+                                            deleteItemFromData('sync-posts', post.id);
+                                        });
+                                }
+                            })
+                            .catch(error => {
+                                console.log('Error while sending post data', error);
+                            });
+                    }
+                })
+        );
+    }
+});
+
+self.addEventListener('notificationclick', e => {
+    console.log('Notification have been clicked', e);
+    console.log(e.notification);
+
+    if (e.action === 'confirm') {
+        console.log('Confirm have been chosen');
+    } else {
+        console.log(e.action);
+        e.waitUntil(
+            clients.matchAll()
+                .then(activeClients => {
+                    const client = activeClients.find(activeClient => {
+                        return activeClient.visibilityState === 'visible';
+                    });
+
+                    if (client) {
+                        client.navigate(e.notification.data.url);
+                        client.focus();
+                    } else {
+                        clients.openWindow(e.notification.data.url);
+                    }
+
+                    e.notification.close();
+                })
+        );
+    }
+
+    e.notification.close();
+});
+
+self.addEventListener('notificationclose', e => {
+    console.log('Notification have been closed', e);
+});
+
+self.addEventListener('push', event => {
+    console.log('push notification received', event);
+
+    if (event.data) {
+        data = JSON.parse(event.data.text());
+
+        event.waitUntil(
+            self.registration.showNotification(data.title, {
+                body: data.content,
+                icon: '/src/images/icons/app-icon-96x96.png',
+                badge: '/src/images/icons/app-icon-96x96.png',
+                data: {
+                    url: data.openUrl
+                }
+            })
+        )
+    }
+});
